@@ -58,6 +58,16 @@ describe('OPK-003: Placeholder Implementation', () => {
     assert.strictEqual(findings.length, 0, 'Expected no findings for clean file');
   });
 
+  it('should detect Python pass with TODO', async () => {
+    const context = makeContext(['python-pass.py']);
+    const findings = await rule.check(context);
+
+    assert.ok(findings.length > 0, 'Expected finding for Python pass with TODO');
+    assert.strictEqual(findings[0].ruleId, 'OPK-003');
+    // It may match the "TODO implement" pattern before the Python-specific pattern
+    assert.ok(findings[0].message.includes('TODO'));
+  });
+
   it('should have correct rule metadata', () => {
     assert.strictEqual(rule.id, 'OPK-003');
     assert.strictEqual(rule.name, 'Placeholder Implementation');
