@@ -6,6 +6,15 @@ import * as path from 'node:path';
 
 const CLI_PATH = path.resolve(__dirname, '..', '..', '..', 'bin', 'opk');
 const PACKAGE_JSON_PATH = path.resolve(__dirname, '..', '..', '..', 'package.json');
+const MISSING_SCAN_PATH = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  'tests',
+  'fixtures',
+  'missing-scan-path',
+);
 
 interface CliResult {
   stdout: string;
@@ -70,5 +79,23 @@ test('CLI commands', async (t) => {
     assert.strictEqual(result.stdout, '');
     assert.match(result.stderr, /Unknown command: unknown/);
     assert.match(result.stderr, /Run "opk --help" for usage information\./);
+  });
+
+  await t.test('should exit with 2 when the scan path does not exist', () => {
+    const result = runCli(['scan', MISSING_SCAN_PATH]);
+
+    assert.strictEqual(result.status, 2);
+    assert.strictEqual(result.stdout, '');
+    assert.match(result.stderr, /Scan path does not exist or cannot be accessed:/);
+    assert.match(result.stderr, /missing-scan-path/);
+  });
+
+  await t.test('should exit with 2 when the scan path is not a directory', () => {
+    const result = runCli(['scan', PACKAGE_JSON_PATH]);
+
+    assert.strictEqual(result.status, 2);
+    assert.strictEqual(result.stdout, '');
+    assert.match(result.stderr, /Scan path is not a directory:/);
+    assert.match(result.stderr, /package\.json/);
   });
 });

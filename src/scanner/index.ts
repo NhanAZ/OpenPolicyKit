@@ -23,6 +23,20 @@ interface OpkConfig {
   exclude?: string[];
 }
 
+function validateRootDirectory(rootDir: string): void {
+  let rootStats: fs.Stats;
+
+  try {
+    rootStats = fs.statSync(rootDir);
+  } catch {
+    throw new Error(`Scan path does not exist or cannot be accessed: ${rootDir}`);
+  }
+
+  if (!rootStats.isDirectory()) {
+    throw new Error(`Scan path is not a directory: ${rootDir}`);
+  }
+}
+
 function loadConfig(rootDir: string): OpkConfig | null {
   const configPath = path.join(rootDir, 'opk.config.json');
   try {
@@ -83,6 +97,8 @@ export async function scan(
 ): Promise<ScanResult> {
   const startTime = Date.now();
   const absoluteRoot = path.resolve(rootDir);
+
+  validateRootDirectory(absoluteRoot);
 
   const config = loadConfig(absoluteRoot);
   const excludePatterns = config?.exclude || [];
