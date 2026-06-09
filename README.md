@@ -19,6 +19,7 @@ $ npx opk scan .
 | OPK-001 | Hardcoded AI credentials | API keys for OpenAI, Anthropic, Cohere, and other AI services left in source |
 | OPK-002 | AI prompt artifacts | Prompt fragments like "As an AI assistant" or "I'm a language model" in code |
 | OPK-003 | Placeholder code | TODO stubs, empty function bodies, and "fill this in" placeholders |
+| OPK-004 | Unpinned dependency versions | Wildcards, ranges, tags, and partial versions in npm dependency sections |
 
 ## Quick start
 

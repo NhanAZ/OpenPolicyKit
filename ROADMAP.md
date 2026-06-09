@@ -14,7 +14,7 @@
 
 ## v0.2.0 - Core expansion
 
-- [ ] Rule: OPK-004 - Wildcard/unpinned dependency versions
+- [x] Rule: OPK-004 - Wildcard/unpinned dependency versions
 - [ ] Rule: OPK-005 - Risky CI/CD workflow changes
 - [ ] Rule: OPK-006 - Hallucinated dependencies (npm registry check)
 - [ ] Rule: OPK-007 - Large generated files
