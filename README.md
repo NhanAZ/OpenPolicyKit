@@ -116,6 +116,10 @@ It complements them by catching risks specific to AI-assisted development - hall
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code standards, and how to add new rules.
 
+## Security
+
+Report suspected vulnerabilities privately by following [SECURITY.md](SECURITY.md).
+
 ## License
 
 [MIT](LICENSE)
