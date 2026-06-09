@@ -18,7 +18,7 @@
 - [x] Rule: OPK-005 - Risky CI/CD workflow changes
 - [x] Rule: OPK-006 - Hallucinated dependencies (npm registry check)
 - [x] Rule: OPK-007 - Large generated files
-- [ ] Configuration file (`opk.config.json`) for rule enable/disable
+- [x] Configuration file (`opk.config.json`) for rule enable/disable
 - [ ] Improved text output formatting
 - [ ] npm package published
 

@@ -55,6 +55,20 @@ async function discoverFiles(rootDir: string): Promise<string[]> {
   return files;
 }
 
+interface OpkConfig {
+  rules?: Record<string, boolean>;
+}
+
+function loadConfig(rootDir: string): OpkConfig | null {
+  const configPath = path.join(rootDir, 'opk.config.json');
+  try {
+    const content = fs.readFileSync(configPath, 'utf8');
+    return JSON.parse(content);
+  } catch {
+    return null;
+  }
+}
+
 export async function scan(rootDir: string): Promise<ScanResult> {
   const startTime = Date.now();
   const absoluteRoot = path.resolve(rootDir);
@@ -66,10 +80,25 @@ export async function scan(rootDir: string): Promise<ScanResult> {
     files,
   };
 
+  const config = loadConfig(absoluteRoot);
+  const disabledRules = new Set<string>();
+
+  if (config?.rules) {
+    for (const [ruleId, enabled] of Object.entries(config.rules)) {
+      if (enabled === false) {
+        disabledRules.add(ruleId);
+      }
+    }
+  }
+
   const allFindings: ScanResult['findings'] = [];
   let rulesRun = 0;
 
   for (const rule of rules) {
+    if (disabledRules.has(rule.id)) {
+      continue;
+    }
+
     try {
       const findings = await rule.check(context);
       allFindings.push(...findings);
