@@ -1,6 +1,6 @@
 {
   "name": "openpolicykit",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Scan your repository for risks introduced by AI coding agents that generic linters miss.",
   "main": "dist/src/cli/index.js",
   "bin": {
