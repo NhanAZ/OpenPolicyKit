@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.js.map
+*.d.ts
+!bin/opk
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+coverage/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

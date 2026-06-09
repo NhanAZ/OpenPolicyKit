@@ -1,0 +1,48 @@
+{
+  "name": "openpolicykit",
+  "version": "0.1.0",
+  "description": "Scan your repository for risks introduced by AI coding agents that generic linters miss.",
+  "main": "dist/src/cli/index.js",
+  "bin": {
+    "opk": "./bin/opk"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/tests/**/*.test.js",
+    "lint": "tsc --noEmit",
+    "scan": "node bin/opk scan .",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "ai",
+    "scanner",
+    "linter",
+    "code-quality",
+    "security",
+    "ai-slop",
+    "hallucination",
+    "policy",
+    "ci"
+  ],
+  "author": "NhanAZ",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NhanAZ/OpenPolicyKit.git"
+  },
+  "homepage": "https://github.com/NhanAZ/OpenPolicyKit",
+  "bugs": {
+    "url": "https://github.com/NhanAZ/OpenPolicyKit/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist/src",
+    "bin"
+  ],
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "typescript": "5.8.3"
+  }
+}
