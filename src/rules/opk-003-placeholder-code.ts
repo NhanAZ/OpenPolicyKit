@@ -87,29 +87,36 @@ const rule: Rule = {
 
       const absolutePath = path.join(context.rootDir, relativePath);
 
-      let stat: fs.Stats;
-      try {
-        stat = fs.statSync(absolutePath);
-      } catch {
-        continue;
+      let content: string | undefined;
+      if (context.getFileContent) {
+        content = await context.getFileContent(relativePath);
+        if (content === undefined) continue;
+      } else {
+        let stat: fs.Stats;
+        try {
+          stat = fs.statSync(absolutePath);
+        } catch {
+          continue;
+        }
+
+        if (stat.size > MAX_FILE_SIZE || stat.size === 0) {
+          continue;
+        }
+
+        let buffer: Buffer;
+        try {
+          buffer = fs.readFileSync(absolutePath);
+        } catch {
+          continue;
+        }
+
+        if (isBinaryContent(buffer)) {
+          continue;
+        }
+
+        content = buffer.toString('utf-8');
       }
 
-      if (stat.size > MAX_FILE_SIZE || stat.size === 0) {
-        continue;
-      }
-
-      let buffer: Buffer;
-      try {
-        buffer = fs.readFileSync(absolutePath);
-      } catch {
-        continue;
-      }
-
-      if (isBinaryContent(buffer)) {
-        continue;
-      }
-
-      const content = buffer.toString('utf-8');
       const lines = content.split('\n');
 
       for (let i = 0; i < lines.length; i++) {

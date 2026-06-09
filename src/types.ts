@@ -16,6 +16,8 @@ export interface ScanContext {
   rootDir: string;
   /** List of file paths relative to rootDir */
   files: string[];
+  /** Optional file cache accessor to improve I/O performance */
+  getFileContent?: (relativePath: string) => Promise<string | undefined>;
 }
 
 export interface Rule {

@@ -27,7 +27,7 @@
 - [x] Python ecosystem support (`requirements.txt`, `pyproject.toml`)
 - [x] Severity filtering (`--min-severity`)
 - [x] File/path exclusion patterns
-- [ ] Performance optimization for large repositories
+- [x] Performance optimization for large repositories
 - [ ] More comprehensive test fixtures
 
 ## Future (not committed)
