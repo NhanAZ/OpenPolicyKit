@@ -21,6 +21,7 @@ $ npx opk scan .
 | OPK-003 | Placeholder code | TODO stubs, empty function bodies, and "fill this in" placeholders |
 | OPK-004 | Unpinned dependency versions | Wildcards, ranges, tags, and partial versions in npm dependency sections |
 | OPK-005 | Risky CI/CD workflows | Privileged triggers, broad permissions, floating action refs, and pipe-to-shell installs |
+| OPK-007 | Large generated files | Files at least 1 MB with generated filenames or header markers |
 
 ## Quick start
 
