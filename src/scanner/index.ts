@@ -69,7 +69,10 @@ function loadConfig(rootDir: string): OpkConfig | null {
   }
 }
 
-export async function scan(rootDir: string): Promise<ScanResult> {
+export async function scan(
+  rootDir: string,
+  minSeverity: 'info' | 'warning' | 'error' = 'info'
+): Promise<ScanResult> {
   const startTime = Date.now();
   const absoluteRoot = path.resolve(rootDir);
 
@@ -112,8 +115,16 @@ export async function scan(rootDir: string): Promise<ScanResult> {
 
   const durationMs = Date.now() - startTime;
 
+  const severityLevels = { info: 0, warning: 1, error: 2 };
+  const minLevel = severityLevels[minSeverity] ?? 0;
+
+  const filteredFindings = allFindings.filter((finding) => {
+    const findingLevel = severityLevels[finding.severity] ?? 0;
+    return findingLevel >= minLevel;
+  });
+
   return {
-    findings: allFindings,
+    findings: filteredFindings,
     scannedFiles: files.length,
     rulesRun,
     durationMs,

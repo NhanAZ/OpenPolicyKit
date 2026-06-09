@@ -27,12 +27,13 @@ Usage:
 
 Scan options:
   --json              Output findings as JSON
+  --min-severity <level>  Filter by minimum severity (info, warning, error)
 
 Examples:
   opk scan
   opk scan ./src
   opk scan --json
-  opk scan ./src --json`;
+  opk scan ./src --min-severity error`;
 
   process.stdout.write(help + '\n');
 }
@@ -66,15 +67,31 @@ async function main(): Promise<void> {
     }
 
     let scanPath = process.cwd();
+    let minSeverity: 'info' | 'warning' | 'error' = 'info';
+
     for (let i = 1; i < args.length; i++) {
       const arg = args[i];
-      if (arg !== '--json' && !arg.startsWith('-')) {
+      if (arg === '--min-severity') {
+        if (i + 1 < args.length) {
+          const val = args[i + 1];
+          if (val === 'info' || val === 'warning' || val === 'error') {
+            minSeverity = val;
+            i++; // skip value
+            continue;
+          } else {
+            process.stderr.write(`Error: Invalid --min-severity value: ${val}. Expected info, warning, or error.\n`);
+            process.exit(2);
+          }
+        } else {
+          process.stderr.write('Error: --min-severity requires a value (info, warning, or error).\n');
+          process.exit(2);
+        }
+      } else if (arg !== '--json' && !arg.startsWith('-')) {
         scanPath = path.resolve(arg);
-        break;
       }
     }
 
-    const result = await scan(scanPath);
+    const result = await scan(scanPath, minSeverity);
 
     if (useJson) {
       process.stdout.write(formatJson(result) + '\n');
