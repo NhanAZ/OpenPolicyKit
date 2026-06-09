@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "this-package-definitely-does-not-exist-12345": "^1.0.0",
+    "file-dependency": "file:../foo"
+  },
+  "devDependencies": {
+    "@myorg/fake-scoped-pkg": "1.0.0",
+    "fake-dev-dep-999": "1.0.0"
+  }
+}
