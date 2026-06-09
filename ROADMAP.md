@@ -19,7 +19,7 @@
 - [x] Rule: OPK-006 - Hallucinated dependencies (npm registry check)
 - [x] Rule: OPK-007 - Large generated files
 - [x] Configuration file (`opk.config.json`) for rule enable/disable
-- [ ] Improved text output formatting
+- [x] Improved text output formatting
 - [ ] npm package published
 
 ## v0.3.0 - Polish
