@@ -1,0 +1,11 @@
+{
+  "name": "all-pinned-dependencies",
+  "version": "1.0.0",
+  "dependencies": {
+    "exact-package": "1.2.3",
+    "prerelease-package": "2.0.0-beta.1",
+    "aliased-package": "npm:replacement-package@3.4.5",
+    "workspace-package": "workspace:4.5.6",
+    "local-package": "file:../local-package"
+  }
+}

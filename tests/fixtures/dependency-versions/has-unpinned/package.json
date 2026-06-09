@@ -1,0 +1,17 @@
+{
+  "name": "has-unpinned-dependencies",
+  "version": "1.0.0",
+  "dependencies": {
+    "wildcard-package": "*",
+    "ranged-package": "^1.2.3"
+  },
+  "devDependencies": {
+    "tagged-package": "latest"
+  },
+  "peerDependencies": {
+    "partial-package": "2.1"
+  },
+  "optionalDependencies": {
+    "exact-optional-package": "3.2.1"
+  }
+}
