@@ -35,6 +35,11 @@ function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
+function formatCount(count: number, singular: string): string {
+  const noun = count === 1 ? singular : `${singular}s`;
+  return `${count} ${noun}`;
+}
+
 export function formatText(result: ScanResult): string {
   const lines: string[] = [];
 
@@ -55,21 +60,23 @@ export function formatText(result: ScanResult): string {
 
   let errorCount = 0;
   let warningCount = 0;
+  let infoCount = 0;
 
   for (const file of files) {
     lines.push('');
     lines.push(colorize(file, colors.cyan + colors.bold));
 
     const fileFindings = byFile[file];
-    
+
     // Calculate max lengths for padding
     let maxLineLen = 0;
     let maxSevLen = 0;
-    
+
     for (const finding of fileFindings) {
       if (finding.severity === 'error') errorCount++;
       if (finding.severity === 'warning') warningCount++;
-      
+      if (finding.severity === 'info') infoCount++;
+
       const lineStr = finding.line ? String(finding.line) : '-';
       maxLineLen = Math.max(maxLineLen, lineStr.length);
       maxSevLen = Math.max(maxSevLen, finding.severity.length);
@@ -78,24 +85,30 @@ export function formatText(result: ScanResult): string {
     for (const finding of fileFindings) {
       const lineStr = finding.line ? String(finding.line) : '';
       const paddedLine = lineStr.padStart(maxLineLen);
-      
+
       const sev = severityFormat(finding.severity);
       const paddedSev = sev + ' '.repeat(Math.max(0, maxSevLen - finding.severity.length));
-      
+
       const ruleId = colorize(finding.ruleId, colors.gray);
-      
+
       lines.push(`  ${paddedLine}  ${paddedSev}  ${finding.message}  ${ruleId}`);
     }
   }
 
   const duration = formatDuration(result.durationMs);
   lines.push('');
-  
-  const summaryParts = [];
-  if (errorCount > 0) summaryParts.push(colorize(`${errorCount} errors`, colors.red + colors.bold));
-  if (warningCount > 0) summaryParts.push(colorize(`${warningCount} warnings`, colors.yellow + colors.bold));
-  if (errorCount === 0 && warningCount === 0) summaryParts.push(`${result.findings.length} findings`);
-  
+
+  const summaryParts: string[] = [];
+  if (errorCount > 0) {
+    summaryParts.push(colorize(formatCount(errorCount, 'error'), colors.red + colors.bold));
+  }
+  if (warningCount > 0) {
+    summaryParts.push(colorize(formatCount(warningCount, 'warning'), colors.yellow + colors.bold));
+  }
+  if (infoCount > 0) {
+    summaryParts.push(colorize(formatCount(infoCount, 'info'), colors.blue + colors.bold));
+  }
+
   lines.push(`\u2716 ${summaryParts.join(', ')} in ${duration}`);
 
   return lines.join('\n');

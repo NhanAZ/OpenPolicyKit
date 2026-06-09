@@ -49,7 +49,10 @@ const infoFinding: RuleFinding = {
   remediation: 'Keep generated files out of source control unless required.',
 };
 
-function createResult(findings: RuleFinding[], overrides: Partial<Omit<ScanResult, 'findings'>> = {}): ScanResult {
+function createResult(
+  findings: RuleFinding[],
+  overrides: Partial<Omit<ScanResult, 'findings'>> = {},
+): ScanResult {
   return {
     findings,
     scannedFiles: 10,
@@ -107,13 +110,28 @@ test('reporter output', async (t) => {
 
   await t.test('should group text findings by sorted file path with summary counts', () => {
     withNoColor(() => {
-      const output = formatText(createResult([errorFinding, warningFinding]));
+      const output = formatText(createResult([errorFinding, warningFinding, infoFinding]));
 
       assert.ok(output.indexOf('src/a.ts') < output.indexOf('src/b.ts'));
+      assert.ok(output.indexOf('src/b.ts') < output.indexOf('src/generated.ts'));
       assert.match(output, /src\/a\.ts\n\s+9\s+warning\s+Prompt artifact found\s+OPK-002/);
       assert.match(output, /src\/b\.ts\n\s+error\s+Placeholder remains\s+OPK-003/);
-      assert.match(output, /\u2716 1 errors, 1 warnings in 1\.2s$/);
+      assert.match(output, /src\/generated\.ts\n\s+1\s+info\s+Large generated file\s+OPK-007/);
+      assert.match(output, /\u2716 1 error, 1 warning, 1 info in 1\.2s$/);
       assert.doesNotMatch(output, /\x1b\[/);
+    });
+  });
+
+  await t.test('should pluralize text summary counts', () => {
+    withNoColor(() => {
+      const secondWarning = {
+        ...warningFinding,
+        filePath: 'src/c.ts',
+        line: 10,
+      };
+      const output = formatText(createResult([warningFinding, secondWarning]));
+
+      assert.match(output, /\u2716 2 warnings in 1\.2s$/);
     });
   });
 });
