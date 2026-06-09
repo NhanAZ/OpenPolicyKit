@@ -20,6 +20,7 @@ $ npx opk scan .
 | OPK-002 | AI prompt artifacts | Prompt fragments like "As an AI assistant" or "I'm a language model" in code |
 | OPK-003 | Placeholder code | TODO stubs, empty function bodies, and "fill this in" placeholders |
 | OPK-004 | Unpinned dependency versions | Wildcards, ranges, tags, and partial versions in npm dependency sections |
+| OPK-005 | Risky CI/CD workflows | Privileged triggers, broad permissions, floating action refs, and pipe-to-shell installs |
 
 ## Quick start
 
