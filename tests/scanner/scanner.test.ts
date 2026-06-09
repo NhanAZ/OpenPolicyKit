@@ -28,4 +28,15 @@ test('Scanner Integration', async (t) => {
     const errorResult = await scan(rootDir, 'error');
     assert.strictEqual(errorResult.findings.length, 0);
   });
+
+  await t.test('should skip excluded paths specified in opk.config.json', async () => {
+    const rootDir = path.join(FIXTURES_DIR, 'scanner-config-exclude');
+    const result = await scan(rootDir);
+
+    // opk.config.json excludes ".*ignored.*" and "tests/".
+    // has-ignored-file.ts and tests/should-be-ignored.ts should be skipped.
+    // has-finding.ts should be scanned and return a finding.
+    assert.strictEqual(result.findings.length, 1);
+    assert.ok(result.findings[0].filePath.includes('has-finding.ts'));
+  });
 });

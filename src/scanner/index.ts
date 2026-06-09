@@ -18,8 +18,24 @@ const SKIP_FILES = new Set([
   'Thumbs.db',
 ]);
 
-async function discoverFiles(rootDir: string): Promise<string[]> {
+interface OpkConfig {
+  rules?: Record<string, boolean>;
+  exclude?: string[];
+}
+
+function loadConfig(rootDir: string): OpkConfig | null {
+  const configPath = path.join(rootDir, 'opk.config.json');
+  try {
+    const content = fs.readFileSync(configPath, 'utf8');
+    return JSON.parse(content);
+  } catch {
+    return null;
+  }
+}
+
+async function discoverFiles(rootDir: string, excludePatterns: string[] = []): Promise<string[]> {
   const files: string[] = [];
+  const excludeRegexes = excludePatterns.map((pattern) => new RegExp(pattern));
 
   async function walk(dir: string): Promise<void> {
     let entries: fs.Dirent[];
@@ -35,6 +51,13 @@ async function discoverFiles(rootDir: string): Promise<string[]> {
       }
 
       const fullPath = path.join(dir, entry.name);
+      let relativePath = path.relative(rootDir, fullPath);
+      // Normalize slashes for consistent regex matching across platforms
+      relativePath = relativePath.replace(/\\/g, '/');
+
+      if (excludeRegexes.some((r) => r.test(relativePath))) {
+        continue;
+      }
 
       if (entry.isDirectory()) {
         if (SKIP_DIRS.has(entry.name)) {
@@ -45,7 +68,6 @@ async function discoverFiles(rootDir: string): Promise<string[]> {
         if (SKIP_FILES.has(entry.name)) {
           continue;
         }
-        const relativePath = path.relative(rootDir, fullPath);
         files.push(relativePath);
       }
     }
@@ -55,20 +77,6 @@ async function discoverFiles(rootDir: string): Promise<string[]> {
   return files;
 }
 
-interface OpkConfig {
-  rules?: Record<string, boolean>;
-}
-
-function loadConfig(rootDir: string): OpkConfig | null {
-  const configPath = path.join(rootDir, 'opk.config.json');
-  try {
-    const content = fs.readFileSync(configPath, 'utf8');
-    return JSON.parse(content);
-  } catch {
-    return null;
-  }
-}
-
 export async function scan(
   rootDir: string,
   minSeverity: 'info' | 'warning' | 'error' = 'info'
@@ -76,14 +84,15 @@ export async function scan(
   const startTime = Date.now();
   const absoluteRoot = path.resolve(rootDir);
 
-  const files = await discoverFiles(absoluteRoot);
+  const config = loadConfig(absoluteRoot);
+  const excludePatterns = config?.exclude || [];
+  
+  const files = await discoverFiles(absoluteRoot, excludePatterns);
 
   const context: ScanContext = {
     rootDir: absoluteRoot,
     files,
   };
-
-  const config = loadConfig(absoluteRoot);
   const disabledRules = new Set<string>();
 
   if (config?.rules) {
