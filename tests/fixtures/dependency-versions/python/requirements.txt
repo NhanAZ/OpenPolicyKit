@@ -1,0 +1,14 @@
+# Pinned
+urllib3==1.26.15
+
+# Unpinned
+requests>=2.28.0
+flask
+pytest~=7.0.0
+
+# Ignore options and comments
+--find-links https://example.com
+-r other.txt
+
+# Ignore github links
+git+https://github.com/example/repo.git

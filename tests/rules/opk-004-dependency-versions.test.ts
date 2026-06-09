@@ -51,11 +51,33 @@ describe('OPK-004: Unpinned Dependency Versions', () => {
     assert.strictEqual(findings.length, 0);
   });
 
-  it('should ignore files other than package.json', async () => {
+  it('should ignore files other than package.json, requirements.txt, or pyproject.toml', async () => {
     const context = makeContext(['has-unpinned/not-package.json']);
     const findings = await rule.check(context);
 
     assert.strictEqual(findings.length, 0);
+  });
+
+  it('should detect unpinned dependencies in requirements.txt', async () => {
+    const context = makeContext(['python/requirements.txt']);
+    const findings = await rule.check(context);
+
+    assert.strictEqual(findings.length, 3);
+    const messages = findings.map(f => f.message);
+    assert.ok(messages.some(m => m.includes('requests')));
+    assert.ok(messages.some(m => m.includes('flask')));
+    assert.ok(messages.some(m => m.includes('pytest')));
+  });
+
+  it('should detect unpinned dependencies in pyproject.toml', async () => {
+    const context = makeContext(['python/pyproject.toml']);
+    const findings = await rule.check(context);
+
+    assert.strictEqual(findings.length, 5);
+    const messages = findings.map(f => f.message);
+    assert.ok(messages.some(m => m.includes('requests')));
+    assert.ok(messages.some(m => m.includes('flask')));
+    assert.ok(messages.some(m => m.includes('python')));
   });
 
   it('should have correct rule metadata', () => {

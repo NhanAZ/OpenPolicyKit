@@ -24,7 +24,7 @@
 
 ## v0.3.0 - Polish
 
-- [ ] Python ecosystem support (`requirements.txt`, `pyproject.toml`)
+- [x] Python ecosystem support (`requirements.txt`, `pyproject.toml`)
 - [ ] Severity filtering (`--min-severity`)
 - [ ] File/path exclusion patterns
 - [ ] Performance optimization for large repositories
