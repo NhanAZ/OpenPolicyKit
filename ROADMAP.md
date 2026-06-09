@@ -28,7 +28,7 @@
 - [x] Severity filtering (`--min-severity`)
 - [x] File/path exclusion patterns
 - [x] Performance optimization for large repositories
-- [ ] More comprehensive test fixtures
+- [x] More comprehensive test fixtures
 
 ## Future (not committed)
 

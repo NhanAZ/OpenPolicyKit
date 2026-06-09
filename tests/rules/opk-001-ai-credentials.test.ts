@@ -59,6 +59,13 @@ describe('OPK-001: Hardcoded AI Credentials', () => {
     assert.strictEqual(findings.length, 0, 'Expected no findings for env var reference');
   });
 
+  it('should NOT flag credentials in .env files', async () => {
+    const context = makeContext(['.env', '.env.local', '.env.example']);
+    const findings = await rule.check(context);
+
+    assert.strictEqual(findings.length, 0, 'Expected no findings for skipped .env files');
+  });
+
   it('should NOT flag clean files without credentials', async () => {
     const context = makeContext(['clean-file.ts']);
     const findings = await rule.check(context);
