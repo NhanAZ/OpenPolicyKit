@@ -88,11 +88,6 @@ export async function scan(
   const excludePatterns = config?.exclude || [];
   
   const files = await discoverFiles(absoluteRoot, excludePatterns);
-
-  const context: ScanContext = {
-    rootDir: absoluteRoot,
-    files,
-  };
   const disabledRules = new Set<string>();
 
   if (config?.rules) {
@@ -106,19 +101,66 @@ export async function scan(
   const allFindings: ScanResult['findings'] = [];
   let rulesRun = 0;
 
-  for (const rule of rules) {
-    if (disabledRules.has(rule.id)) {
-      continue;
-    }
+  const activeRules = rules.filter(r => !disabledRules.has(r.id));
+  rulesRun = activeRules.length;
 
-    try {
-      const findings = await rule.check(context);
-      allFindings.push(...findings);
-      rulesRun++;
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      process.stderr.write(`Warning: Rule ${rule.id} failed: ${message}\n`);
-      rulesRun++;
+  const CHUNK_SIZE = 100;
+  for (let i = 0; i < files.length; i += CHUNK_SIZE) {
+    const chunk = files.slice(i, i + CHUNK_SIZE);
+    const fileCache = new Map<string, string | null>();
+
+    const getFileContent = async (relativePath: string): Promise<string | undefined> => {
+      if (fileCache.has(relativePath)) {
+        const cached = fileCache.get(relativePath);
+        return cached === null ? undefined : cached;
+      }
+      try {
+        const absolutePath = path.join(absoluteRoot, relativePath);
+        const stat = await fs.promises.stat(absolutePath);
+        if (stat.size === 0 || stat.size > 1_000_000) {
+          fileCache.set(relativePath, null);
+          return undefined;
+        }
+        const buffer = await fs.promises.readFile(absolutePath);
+        
+        // binary check
+        let isBinary = false;
+        const checkLength = Math.min(buffer.length, 8000);
+        for (let j = 0; j < checkLength; j++) {
+          if (buffer[j] === 0) {
+            isBinary = true;
+            break;
+          }
+        }
+
+        if (isBinary) {
+          fileCache.set(relativePath, null);
+          return undefined;
+        }
+
+        const content = buffer.toString('utf8');
+        fileCache.set(relativePath, content);
+        return content;
+      } catch {
+        fileCache.set(relativePath, null);
+        return undefined;
+      }
+    };
+
+    const chunkContext: ScanContext = {
+      rootDir: absoluteRoot,
+      files: chunk,
+      getFileContent,
+    };
+
+    for (const rule of activeRules) {
+      try {
+        const findings = await rule.check(chunkContext);
+        allFindings.push(...findings);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        process.stderr.write(`Warning: Rule ${rule.id} failed: ${message}\n`);
+      }
     }
   }
 
